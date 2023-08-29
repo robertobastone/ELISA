@@ -10,7 +10,7 @@ from termcolor import colored # customize ui
 import elisa_settings as esettings
 
 ################################################### CONSTANTS
-numversion = "1.02"
+numversion = "1.03"
 textColor = "blue"
 welcomeText = "ELISA VERSION " + numversion + " IS PUTTING ON HER GLASSES"
 greetingText = "ELISA VERSION " + numversion + " HAS COMPLETED THE ANALYSIS"
@@ -52,10 +52,10 @@ class main:
             upperX = self.calculateXUpperLimit(df['T'].max(),settings.xbase)
 
             controlGroup = KaplanMeierFitter().fit(T[~ix], E[~ix], label='control')
-            ax = controlGroup.plot(ci_show=False)
+            ax = controlGroup.plot(ci_show=True)
             group1 = KaplanMeierFitter().fit(T[ix], E[ix], label='miR-137')
             #print(T[ix])
-            ax = group1.plot_survival_function(ax=ax, ci_show=False)
+            ax = group1.plot_survival_function(ax=ax, ci_show=True)
             
             ax.set_title(settings.title,fontsize=settings.titleFontSize)
             ########## x axis settings
@@ -77,7 +77,7 @@ class main:
                 "miR-137": group1,                
             }
 
-            self.generateExcelFile(settings.excelFile,np.linspace(0.0, upperX, settings.tableRowsNumber),group2kpfit)
+            self.generateExcelFile(settings,np.linspace(0.0, upperX, settings.tableRowsNumber),group2kpfit)
 
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -92,15 +92,15 @@ class main:
         return (-(maxValue // -base)*base)+offset
 
     ########## save results in an excel file
-    def generateExcelFile(self, nameFile, timeline, group2kpfit):
+    def generateExcelFile(self, settings, timeline, group2kpfit):
         try:
-            with pd.ExcelWriter(nameFile) as writer:  
+            with pd.ExcelWriter(settings.excelFile) as writer:  
                 for group in group2kpfit:
                     survivalFunction = group2kpfit[group].survival_function_at_times(timeline) # get survival function (panda series)
-                    survivaltable =  survivalFunction.sort_values(0,ascending=False).reset_index().rename(columns={'index':'Time',group:'Survival Probability'}) # get results in table format
-                    # print(survivaltable) 
-                    # print(colored("--------------------------------------------------------------------------------------",textColor))           
-                    survivaltable.to_excel(writer, sheet_name=group, index=False, header=[settings.timeColumnName,self.survivalColumnName])
+                    survivaltable =  survivalFunction.reset_index() # get results in table format
+                    # print(survivaltable.sort_values(by=['index'],ignore_index=True))
+                    # print(colored("--------------------------------------------------------------------------------------",textColor))
+                    survivaltable.to_excel(writer, sheet_name=group, index=False, header=[settings.timeColumnName,settings.survivalColumnName])
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             print(colored(str(e), 'red'))
