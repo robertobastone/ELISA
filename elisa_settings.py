@@ -23,6 +23,7 @@ class getSettings:
         ########## x axis settings
         self.ylim = [0,1.05]
         self.ylabel = 'Population Survival (percentage)'
+        self.changeScale = True
         self.yticks = [0.2,0.4,0.6,0.8,1.0]
         self.yticksLabel = [20,40,60,80,100]
         ########## save settings

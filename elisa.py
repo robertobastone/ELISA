@@ -64,8 +64,9 @@ class main:
             ########## y axis settings
             ax.set_ylim(settings.ylim[0],settings.ylim[1])
             ax.set_ylabel(settings.ylabel,fontsize=settings.axisLabelFontSize)
-            ax.set_yticks(settings.yticks)
-            ax.set_yticklabels(settings.yticksLabel)
+            if settings.changeScale:
+                ax.set_yticks(settings.yticks)
+                ax.set_yticklabels(settings.yticksLabel)
 
             plt.legend(fontsize=settings.LabelFontSize) # using a size in points
             fig.tight_layout()
@@ -98,9 +99,15 @@ class main:
                 for group in group2kpfit:
                     survivalFunction = group2kpfit[group].survival_function_at_times(timeline) # get survival function (panda series)
                     survivaltable =  survivalFunction.reset_index() # get results in table format
+                    confidenceInterval = group2kpfit[group].confidence_interval_
+                    events = group2kpfit[group].event_table
+                    confidenceInterval.rename(columns={'': 'event_at'})
+                    table = pd.concat([events, confidenceInterval], axis=1).reset_index()
                     # print(survivaltable.sort_values(by=['index'],ignore_index=True))
+                    print(table)
                     # print(colored("--------------------------------------------------------------------------------------",textColor))
                     survivaltable.to_excel(writer, sheet_name=group, index=False, header=[settings.timeColumnName,settings.survivalColumnName])
+                    table.to_excel(writer, sheet_name=group+' all data', index=False)
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             print(colored(str(e), 'red'))
