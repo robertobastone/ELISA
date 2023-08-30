@@ -103,8 +103,7 @@ class main:
                     events = group2kpfit[group].event_table
                     confidenceInterval.rename(columns={'': 'event_at'})
                     table = pd.concat([events, confidenceInterval], axis=1).reset_index()
-                    # print(survivaltable.sort_values(by=['index'],ignore_index=True))
-                    print(table)
+                    # print(survivaltable.sort_values(by=['index'],ignore_index=True)
                     # print(colored("--------------------------------------------------------------------------------------",textColor))
                     survivaltable.to_excel(writer, sheet_name=group, index=False, header=[settings.timeColumnName,settings.survivalColumnName])
                     table.to_excel(writer, sheet_name=group+' all data', index=False)
