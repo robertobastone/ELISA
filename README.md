@@ -12,3 +12,5 @@ Estimation of LIfelines and Survival Analysis (ELISA) is a script which exploits
 - minimally funtioning code
 ## Version 1.01 (28th August 2023)
 - OOP Version
+## Version 1.02 (29th August 2023)
+- Saving data into excel file
