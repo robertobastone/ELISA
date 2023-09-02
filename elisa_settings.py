@@ -8,8 +8,9 @@ class getSettings:
     def __init__(self):
 
         ######################### FIT SETTINGS
-        self.functionDictionary = { "Kaplan Meier": KaplanMeierFitter(),
-                                    " Weibull Fitter":  WeibullFitter()
+        self.functionDictionary = { "Kaplan Meier": KaplanMeierFitter,
+                                    "Weibull Fitter":  WeibullFitter,
+                                    "Exponential Fitter": ExponentialFitter
         } # list here the fitter function of the lifeline library
 
         ######################### PLOT SETTINGS
@@ -28,7 +29,7 @@ class getSettings:
         self.xbase = 10
         self.showSummaryTables = True
         if self.showSummaryTables:
-            self.xlim = [None,None] # if true, no limits should be forced in order for the table to align with the x ticks
+            self.xlim = [None,None] # if true, no limits should be forced, this way the table will be aligned to the x ticks
         ########## x axis settings
         self.ylim = [0,1.05]
         self.ylabel = 'Population Survival (percentage)'
