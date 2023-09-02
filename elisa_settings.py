@@ -1,4 +1,5 @@
 ######################### LIBRARIES #########################
+from lifelines import KaplanMeierFitter, WeibullFitter, ExponentialFitter
 
 ######################### CODE #########################
 
@@ -6,20 +7,28 @@ class getSettings:
 
     def __init__(self):
 
+        ######################### FIT SETTINGS
+        self.functionDictionary = { "Kaplan Meier": KaplanMeierFitter(),
+                                    " Weibull Fitter":  WeibullFitter()
+        } # list here the fitter function of the lifeline library
+
         ######################### PLOT SETTINGS
         ########## plot size
         self.figsize_x = 13
         self.figsize_y = 10
         ########## plot title
-        self.title = 'Survival Function (Kaplan-Meier estimator)' 
+        self.title = 'Survival Function' 
         ########## plot font size
         self.titleFontSize = 20
         self.axisLabelFontSize = 15
         self.LabelFontSize = 15 
         ########## x axis settings
-        self.xlim = [0,1.1]
+        self.xlim = [0,None]
         self.xlabel = 'Time'
         self.xbase = 10
+        self.showSummaryTables = True
+        if self.showSummaryTables:
+            self.xlim = [None,None] # if true, no limits should be forced in order for the table to align with the x ticks
         ########## x axis settings
         self.ylim = [0,1.05]
         self.ylabel = 'Population Survival (percentage)'
@@ -28,7 +37,7 @@ class getSettings:
         self.yticksLabel = [20,40,60,80,100]
         ########## save settings
         self.dpi = 150
-        self.plotName = 'elisa.png'
+        self.plotName = '_elisa.png'
 
         ######################### TABLE SETTINGS
         ########## table settings
