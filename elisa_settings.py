@@ -7,11 +7,19 @@ class getSettings:
 
     def __init__(self):
 
+        self.numversion = "1.04"
+
         ######################### FIT SETTINGS
         self.functionDictionary = { "Kaplan Meier": KaplanMeierFitter,
                                     "Weibull Fitter":  WeibullFitter,
                                     "Exponential Fitter": ExponentialFitter
         } # list here the fitter function of the lifeline library
+
+        ######################### UI SETTINGS
+        self.textColor = "blue"
+        self.welcomeText = "ELISA VERSION " + self.numversion + " IS PUTTING ON HER GLASSES"
+        self.workingText = "ELISA VERSION " + self.numversion + " IS ANALYSING THE DATA"
+        self.greetingText = "ELISA VERSION " + self.numversion + " HAS COMPLETED THE ANALYSIS"
 
         ######################### PLOT SETTINGS
         ########## plot size
@@ -43,6 +51,8 @@ class getSettings:
         ######################### TABLE SETTINGS
         ########## table settings
         self.tableRowsNumber = 31
+        ########## preventing from naming sheets with more than specified number of characters
+        self.truncate = 30
         ########## table settings
         self.timeColumnName = 'Time'
         self.survivalColumnName = 'Survival Probability (percentage)'

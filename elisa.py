@@ -11,11 +11,6 @@ from termcolor import colored # customize ui
 import elisa_settings as esettings
 
 ################################################### CONSTANTS
-numversion = "1.03"
-textColor = "blue"
-welcomeText = "ELISA VERSION " + numversion + " IS PUTTING ON HER GLASSES"
-workingText = "ELISA VERSION " + numversion + " IS ANALYSING THE DATA"
-greetingText = "ELISA VERSION " + numversion + " HAS COMPLETED THE ANALYSIS"
 dataLocation ='constellations.xlsx' # file name
 
 ################################################### CODE
@@ -37,24 +32,28 @@ class main:
 
     ########## start method
     def __init__(self):
-        print(colored("--------------------------------------------------------------------------------------",textColor))
-        print(colored("--------------------------------------------------------------------------------------",textColor))
-        print(colored(welcomeText, textColor))
-        print(colored("--------------------------------------------------------------------------------------",textColor))
-        print(colored("--------------------------------------------------------------------------------------",textColor))
         try:
             settings = esettings.getSettings() # loading plot settings
+            self.generateUImessage(settings.welcomeText,settings.textColor) # welcome message
             self.survivalAnalysis(settings) # Survival Analysis
-            self.sayGreetings() # closing method
+            self.generateUImessage(settings.greetingText,settings.textColor) # goodbye message
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             print(colored(str(e), 'red'))
             print(colored(str(exc_tb.tb_frame.f_code.co_filename) + " at  line " + str(exc_tb.tb_lineno), 'red'))
 
+    ########## generate UI message method
+    def generateUImessage(self, message, textColor):
+        print(colored("--------------------------------------------------------------------------------------",textColor))
+        print(colored("--------------------------------------------------------------------------------------",textColor))
+        print(colored(message, textColor))
+        print(colored("--------------------------------------------------------------------------------------",textColor))
+        print(colored("--------------------------------------------------------------------------------------",textColor))
+
     ########## ending method
     def survivalAnalysis(self,settings):
         try:
-            print(colored(workingText, textColor))
+            print(colored(settings.workingText, settings.textColor))
             #workbook = pd.ExcelFile(dataLocation) # open excel file
             data = load_waltons() # returns a Pandas DataFrame            
             self.plottingFits(settings,data)
@@ -132,17 +131,9 @@ class main:
                     table.rename(columns={ table.columns[0]: settings.timeColumnName}, inplace=True) # inplace attribute prevents from creating a copy 
                     # print(survivaltable.sort_values(by=['index'],ignore_index=True)
                     # print(colored("--------------------------------------------------------------------------------------",textColor))
-                    survivaltable.to_excel(writer, sheet_name=group, index=False, header=[settings.timeColumnName,settings.survivalColumnName])
-                    table.to_excel(writer, sheet_name=group+'_overview', index=False)
+                    survivaltable.to_excel(writer, sheet_name=group[:settings.truncate], index=False, header=[settings.timeColumnName,settings.survivalColumnName])
+                    table.to_excel(writer, sheet_name=(group+'_overview')[:settings.truncate], index=False)
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             print(colored(str(e), 'red'))
             print(colored(str(exc_tb.tb_frame.f_code.co_filename) + " at  line " + str(exc_tb.tb_lineno), 'red'))
-
-    ########## ending method
-    def sayGreetings(self):
-        print(colored("--------------------------------------------------------------------------------------",textColor))
-        print(colored("--------------------------------------------------------------------------------------",textColor))
-        print(colored(greetingText, textColor))
-        print(colored("--------------------------------------------------------------------------------------",textColor))
-        print(colored("--------------------------------------------------------------------------------------",textColor))
