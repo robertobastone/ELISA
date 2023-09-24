@@ -17,6 +17,7 @@ class getSettings:
 
         ######################### UI SETTINGS
         self.textColor = "blue"
+        self.exceptionColor = "red"
         self.welcomeText = "ELISA VERSION " + self.numversion + " IS PUTTING ON HER GLASSES"
         self.workingText = "ELISA VERSION " + self.numversion + " IS ANALYSING THE DATA"
         self.greetingText = "ELISA VERSION " + self.numversion + " HAS COMPLETED THE ANALYSIS"

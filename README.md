@@ -1,5 +1,5 @@
 # ELISA
-Estimation of LIfelines and Survival Analysis (ELISA) is a script which exploits the Python libraries to plot the Kaplan-Meier estimators.
+Estimation of LIfelines and Survival Analysis (ELISA) is a script which exploits the Python library <a href="https://lifelines.readthedocs.io/en/stable/index.html">lifelines</a> to plot the Kaplan-Meier estimators.
 
 # Milestones
 1. 21st August 2023:

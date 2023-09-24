@@ -11,7 +11,7 @@ from termcolor import colored # customize ui
 import elisa_settings as esettings
 
 ################################################### CONSTANTS
-dataLocation ='constellations.xlsx' # file name
+dataLocation ='data.xlsx' # file name
 
 ################################################### CODE
 
@@ -38,9 +38,7 @@ class main:
             self.survivalAnalysis(settings) # Survival Analysis
             self.generateUImessage(settings.greetingText,settings.textColor) # goodbye message
         except Exception as e:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            print(colored(str(e), 'red'))
-            print(colored(str(exc_tb.tb_frame.f_code.co_filename) + " at  line " + str(exc_tb.tb_lineno), 'red'))
+            self.raiseGenericException(e, settings.exceptionColor)
 
     ########## generate UI message method
     def generateUImessage(self, message, textColor):
@@ -50,6 +48,12 @@ class main:
         print(colored("--------------------------------------------------------------------------------------",textColor))
         print(colored("--------------------------------------------------------------------------------------",textColor))
 
+    ########## generate UI message method
+    def raiseGenericException(self, exception, textColor):
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        print(colored(str(exception), textColor))
+        print(colored(str(exc_tb.tb_frame.f_code.co_filename) + " at  line " + str(exc_tb.tb_lineno), textColor))
+
     ########## ending method
     def survivalAnalysis(self,settings):
         try:
@@ -58,9 +62,7 @@ class main:
             data = load_waltons() # returns a Pandas DataFrame            
             self.plottingFits(settings,data)
         except Exception as e:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            print(colored(str(e), 'red'))
-            print(colored(str(exc_tb.tb_frame.f_code.co_filename) + " at  line " + str(exc_tb.tb_lineno), 'red'))
+            self.raiseGenericException(e, settings.exceptionColor)
 
     ########## plotting 
     def plottingFits(self, settings, data ):
@@ -103,9 +105,7 @@ class main:
                 
             self.generateExcelFile(settings, timeLine, group2kpfit)
         except Exception as e:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            print(colored(str(e), 'red'))
-            print(colored(str(exc_tb.tb_frame.f_code.co_filename) + " at  line " + str(exc_tb.tb_lineno), 'red'))
+            self.raiseGenericException(e, settings.exceptionColor)
 
     ########## custom ceiling method
     def calculateXUpperLimit(self, maxValue, base):
@@ -134,6 +134,4 @@ class main:
                     survivaltable.to_excel(writer, sheet_name=group[:settings.truncate], index=False, header=[settings.timeColumnName,settings.survivalColumnName])
                     table.to_excel(writer, sheet_name=(group+'_overview')[:settings.truncate], index=False)
         except Exception as e:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            print(colored(str(e), 'red'))
-            print(colored(str(exc_tb.tb_frame.f_code.co_filename) + " at  line " + str(exc_tb.tb_lineno), 'red'))
+            self.raiseGenericException(e, settings.exceptionColor)
