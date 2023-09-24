@@ -4,6 +4,7 @@ import numpy as np
 from lifelines.datasets import load_waltons
 from lifelines.plotting import add_at_risk_counts
 from lifelines import *
+from lifelines.statistics import survival_difference_at_fixed_point_in_time_test
 import os # info about file
 import sys # better management of the exceptions
 import pandas as pd # open excel file
@@ -89,6 +90,7 @@ class main:
                     group2kpfit[function +  "_" + sf.groupname] = fit 
                 if settings.showSummaryTables:
                     add_at_risk_counts(*fitList)
+                self.generateExcelFiles(settings, sfList)
                 ax.set_title(plotTitle,fontsize=settings.titleFontSize)
                 ########## x axis settings
                 ax.set_xlim(settings.xlim[0],upperX)
@@ -101,8 +103,7 @@ class main:
                     ax.set_yticklabels(settings.yticksLabel)
                 ax.legend(fontsize=settings.LabelFontSize)
                 plt.tight_layout()
-                plt.savefig(function + settings.plotName, dpi=settings.dpi)
-                
+                plt.savefig(function + settings.plotName, dpi=settings.dpi)                
             self.generateExcelFile(settings, timeLine, group2kpfit)
         except Exception as e:
             self.raiseGenericException(e, settings.exceptionColor)
@@ -117,6 +118,18 @@ class main:
     ########## generate plot title
     def generatePlotTitle(self, title, function):
         return title + ' (' + function + ')'
+
+    ########## save results in an excel file
+    def generateExcelFiles(self, settings, sfList):
+        try:
+            with pd.ExcelWriter(settings.excelFile) as writer:  
+                testResults = survival_difference_at_fixed_point_in_time_test(settings.pointIntime, sfList[1].survivalFit, sfList[0].survivalFit) 
+                pvalue =  testResults.p_value
+                testStats = testResults.test_statistic   
+                df = pd.DataFrame([[pvalue, testStats]], columns=['p_value', 'test Stats'])        
+                df.to_excel(writer, sheet_name='s', index=False)
+        except Exception as e:
+            self.raiseGenericException(e, settings.exceptionColor)
 
     ########## save results in an excel file
     def generateExcelFile(self, settings, timeline, group2kpfit):

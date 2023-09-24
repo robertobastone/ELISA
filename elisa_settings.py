@@ -10,9 +10,9 @@ class getSettings:
         self.numversion = "1.04"
 
         ######################### FIT SETTINGS
-        self.functionDictionary = { "Kaplan Meier": KaplanMeierFitter,
-                                    "Weibull Fitter":  WeibullFitter,
-                                    "Exponential Fitter": ExponentialFitter
+        self.functionDictionary = { "Kaplan Meier": KaplanMeierFitter #,
+                                    # "Weibull Fitter":  WeibullFitter,
+                                    # "Exponential Fitter": ExponentialFitter
         } # list here the fitter function of the lifeline library
 
         ######################### UI SETTINGS
@@ -39,6 +39,7 @@ class getSettings:
         self.showSummaryTables = True
         if self.showSummaryTables:
             self.xlim = [None,None] # if true, no limits should be forced, this way the table will be aligned to the x ticks
+        self.pointIntime = 10
         ########## x axis settings
         self.ylim = [0,1.05]
         self.ylabel = 'Population Survival (percentage)'
@@ -47,7 +48,7 @@ class getSettings:
         self.yticksLabel = [20,40,60,80,100]
         ########## save settings
         self.dpi = 150
-        self.plotName = '_elisa.png'
+        self.plotName = ' survival curves.png'
 
         ######################### TABLE SETTINGS
         ########## table settings
