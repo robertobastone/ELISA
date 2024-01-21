@@ -59,8 +59,8 @@ class main:
     def survivalAnalysis(self,settings):
         try:
             print(colored(settings.workingText, settings.textColor))
-            #workbook = pd.ExcelFile(dataLocation) # open excel file
-            data = load_waltons() # returns a Pandas DataFrame            
+            data = pd.ExcelFile('testData.xlsx') # open excel file
+            #data = load_waltons() # returns a Pandas DataFrame    
             self.plottingFits(settings,data)
         except Exception as e:
             self.raiseGenericException(e, settings.exceptionColor)
@@ -68,29 +68,27 @@ class main:
     ########## plotting 
     def plottingFits(self, settings, data ):
         try:
-            T = data['T']
-            E = data['E']
-            groups = data['group']
-            ix = (groups == 'miR-137')
-            upperX = self.calculateXUpperLimit(data['T'].max(),settings.xbase)
+            dataControl = data.parse('MN')
+            dataGroup = data.parse('T1')
+            upperX = self.calculateXUpperLimit(dataControl['T'].max(),settings.xbase)
             timeLine = np.linspace(0.0, upperX, settings.tableRowsNumber)
             group2kpfit = {}
-            dictionary = settings.functionDictionary
-            sfList = [SurvivalFit('control', T[~ix], E[~ix], None),
-                        SurvivalFit('miR-137', T[ix], E[ix], None)]
+            dictionary = settings.functionDictionary      
+            sfList = [SurvivalFit('MN', dataControl['T'], dataControl['E'], None),
+                        SurvivalFit('T1', dataGroup['T'], dataGroup['E'], None)]
             for function in dictionary:
                 fitList = []
                 plotTitle = self.generatePlotTitle(settings.title, function)
                 fig, ax = plt.subplots(1, 1, figsize=(settings.figsize_x, settings.figsize_y))
                 for sf in sfList:      
                     fit = dictionary[function]().fit(sf.time,sf.events, label=sf.groupname)
-                    ax = fit.plot_survival_function(ci_show=True, show_censors=True, censor_styles={'ms': 6, 'marker': 's'})
+                    ax = fit.plot_survival_function(ci_show=False, show_censors=False, censor_styles={'ms': 6, 'marker': 's'})
                     sf.survivalFit = fit
                     fitList.append(fit)
                     group2kpfit[function +  "_" + sf.groupname] = fit 
                 if settings.showSummaryTables:
                     add_at_risk_counts(*fitList)
-                self.generateExcelFiles(settings, sfList)
+                self.generateTestResults(settings, sfList)
                 ax.set_title(plotTitle,fontsize=settings.titleFontSize)
                 ########## x axis settings
                 ax.set_xlim(settings.xlim[0],upperX)
@@ -101,10 +99,10 @@ class main:
                 if settings.changeScale:
                     ax.set_yticks(settings.yticks)
                     ax.set_yticklabels(settings.yticksLabel)
-                ax.legend(fontsize=settings.LabelFontSize)
+                #ax.legend(fontsize=settings.LabelFontSize)
                 plt.tight_layout()
                 plt.savefig(function + settings.plotName, dpi=settings.dpi)                
-            self.generateExcelFile(settings, timeLine, group2kpfit)
+            #self.generateExcelFile(settings, timeLine, group2kpfit)
         except Exception as e:
             self.raiseGenericException(e, settings.exceptionColor)
 
@@ -120,10 +118,12 @@ class main:
         return title + ' (' + function + ')'
 
     ########## save results in an excel file
-    def generateExcelFiles(self, settings, sfList):
+    def generateTestResults(self, settings, sfList):
         try:
-            with pd.ExcelWriter(settings.excelFile) as writer:  
-                testResults = survival_difference_at_fixed_point_in_time_test(settings.pointIntime, sfList[1].survivalFit, sfList[0].survivalFit) 
+            with pd.ExcelWriter(settings.excelPValuesFile) as writer:  
+                testResults = survival_difference_at_fixed_point_in_time_test(settings.pointIntime, sfList[1].survivalFit, sfList[0].survivalFit)
+                if settings.showChiSquaredSummary:
+                    testResults.print_summary()
                 pvalue =  testResults.p_value
                 testStats = testResults.test_statistic   
                 df = pd.DataFrame([[pvalue, testStats]], columns=['p_value', 'test Stats'])        

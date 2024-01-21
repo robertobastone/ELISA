@@ -7,7 +7,8 @@ class getSettings:
 
     def __init__(self):
 
-        self.numversion = "1.04"
+        self.numversion = "1.05"
+        self.excelFile = "walton.xlsx"
 
         ######################### FIT SETTINGS
         self.functionDictionary = { "Kaplan Meier": KaplanMeierFitter #,
@@ -34,15 +35,15 @@ class getSettings:
         self.LabelFontSize = 15 
         ########## x axis settings
         self.xlim = [0,None]
-        self.xlabel = 'Time'
+        self.xlabel = 'Time (month)'
         self.xbase = 10
-        self.showSummaryTables = True
+        self.showSummaryTables = False
         if self.showSummaryTables:
             self.xlim = [None,None] # if true, no limits should be forced, this way the table will be aligned to the x ticks
         self.pointIntime = 10
         ########## x axis settings
         self.ylim = [0,1.05]
-        self.ylabel = 'Population Survival (percentage)'
+        self.ylabel = 'Population Survival (%)'
         self.changeScale = True
         self.yticks = [0.2,0.4,0.6,0.8,1.0]
         self.yticksLabel = [20,40,60,80,100]
@@ -56,9 +57,11 @@ class getSettings:
         ########## preventing from naming sheets with more than specified number of characters
         self.truncate = 30
         ########## table settings
+        self.showChiSquaredSummary = False
         self.timeColumnName = 'Time'
         self.survivalColumnName = 'Survival Probability (percentage)'
         ########## save settings
         self.excelFile = 'results.xlsx'
+        self.excelPValuesFile = 'pvalues.xlsx'
         
         

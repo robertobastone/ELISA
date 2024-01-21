@@ -19,3 +19,5 @@ Estimation of LIfelines and Survival Analysis (ELISA) is a script which exploits
 ## Version 1.04 (10th September 2023)
 - improved ui messages generation
 - created setting in order to prevent the "UserWarning: Title is more than 31 characters."
+## Version 1.05 (21st January 2023)
+- added code to read data from .xlsx files
