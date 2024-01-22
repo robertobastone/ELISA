@@ -19,12 +19,14 @@ dataLocation ='data.xlsx' # file name
 ######### defining wrapper class for SurvivalFit Object
 class SurvivalFit(object):
     groupname = ""
+    color = ""
     time = []
     events = []
     survivalFit = ()
 
-    def __init__(self, groupname, time, events, survivalFit):
+    def __init__(self, groupname, color, time, events, survivalFit):
         self.groupname = groupname
+        self.color = color
         self.time = time
         self.events = events
         self.survivalFit = survivalFit
@@ -68,27 +70,28 @@ class main:
     ########## plotting 
     def plottingFits(self, settings, data ):
         try:
-            dataControl = data.parse('MN')
-            dataGroup = data.parse('T1')
+            dataControl = data.parse(settings.controlSheet)
+            dataGroup = data.parse(settings.groupSheet)
             upperX = self.calculateXUpperLimit(dataControl['T'].max(),settings.xbase)
             timeLine = np.linspace(0.0, upperX, settings.tableRowsNumber)
             group2kpfit = {}
             dictionary = settings.functionDictionary      
-            sfList = [SurvivalFit('MN', dataControl['T'], dataControl['E'], None),
-                        SurvivalFit('T1', dataGroup['T'], dataGroup['E'], None)]
+            sfList = [SurvivalFit(settings.controlSheet, settings.controlSheetColor, dataControl['T'], dataControl['E'], None),
+                        SurvivalFit(settings.groupSheet, settings.groupSheetColor, dataGroup['T'], dataGroup['E'], None)]
             for function in dictionary:
                 fitList = []
                 plotTitle = self.generatePlotTitle(settings.title, function)
                 fig, ax = plt.subplots(1, 1, figsize=(settings.figsize_x, settings.figsize_y))
                 for sf in sfList:      
-                    fit = dictionary[function]().fit(sf.time,sf.events, label=sf.groupname)
-                    ax = fit.plot_survival_function(ci_show=False, show_censors=False, censor_styles={'ms': 6, 'marker': 's'})
+                    fit = dictionary[function]().fit(sf.time, sf.events, label=sf.groupname)
+                    ax = fit.plot_survival_function(color=sf.color, ci_show=settings.showCI, show_censors=settings.showCensors, censor_styles={'ms': 6, 'marker': 's'})
                     sf.survivalFit = fit
                     fitList.append(fit)
                     group2kpfit[function +  "_" + sf.groupname] = fit 
                 if settings.showSummaryTables:
                     add_at_risk_counts(*fitList)
-                self.generateTestResults(settings, sfList)
+                if settings.runStatisticTests:
+                    self.generateTestResults(settings, sfList)
                 ax.set_title(plotTitle,fontsize=settings.titleFontSize)
                 ########## x axis settings
                 ax.set_xlim(settings.xlim[0],upperX)
@@ -99,10 +102,13 @@ class main:
                 if settings.changeScale:
                     ax.set_yticks(settings.yticks)
                     ax.set_yticklabels(settings.yticksLabel)
-                #ax.legend(fontsize=settings.LabelFontSize)
+                ax.legend(fontsize=settings.LabelFontSize)
+                if settings.hideLegend:
+                    ax.get_legend().remove()
                 plt.tight_layout()
-                plt.savefig(function + settings.plotName, dpi=settings.dpi)                
-            #self.generateExcelFile(settings, timeLine, group2kpfit)
+                plt.savefig(function + settings.plotName, dpi=settings.dpi)  
+            if settings.runStatisticTests:              
+                self.generateExcelFile(settings, timeLine, group2kpfit)
         except Exception as e:
             self.raiseGenericException(e, settings.exceptionColor)
 

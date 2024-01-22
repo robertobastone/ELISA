@@ -15,6 +15,11 @@ class getSettings:
                                     # "Weibull Fitter":  WeibullFitter,
                                     # "Exponential Fitter": ExponentialFitter
         } # list here the fitter function of the lifeline library
+        self.controlSheet = 'MN'
+        self.controlSheetColor = '#333399'
+        self.groupSheet =  'T1'
+        self.groupSheetColor = '#cc1912'
+        self.runStatisticTests = False
 
         ######################### UI SETTINGS
         self.textColor = "blue"
@@ -32,7 +37,6 @@ class getSettings:
         ########## plot font size
         self.titleFontSize = 20
         self.axisLabelFontSize = 15
-        self.LabelFontSize = 15 
         ########## x axis settings
         self.xlim = [0,None]
         self.xlabel = 'Time (month)'
@@ -46,7 +50,14 @@ class getSettings:
         self.ylabel = 'Population Survival (%)'
         self.changeScale = True
         self.yticks = [0.2,0.4,0.6,0.8,1.0]
-        self.yticksLabel = [20,40,60,80,100]
+        self.multiplier = 100
+        self.yticksLabel = [int(tick * self.multiplier) for tick in self.yticks]
+        ########## confidence intervals and censors settings
+        self.showCI = False 
+        self.showCensors = False
+        ########## legend settings
+        self.LabelFontSize = 15
+        self.hideLegend = False 
         ########## save settings
         self.dpi = 150
         self.plotName = ' survival curves.png'
