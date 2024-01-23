@@ -1,18 +1,15 @@
 ################################################### LIBRARIES
 import matplotlib.pyplot as plt
 import numpy as np
-from lifelines.datasets import load_waltons
+#from lifelines.datasets import load_waltons
 from lifelines.plotting import add_at_risk_counts
 from lifelines import *
-from lifelines.statistics import survival_difference_at_fixed_point_in_time_test
+from lifelines.statistics import *
 import os # info about file
 import sys # better management of the exceptions
 import pandas as pd # open excel file
 from termcolor import colored # customize ui
 import elisa_settings as esettings
-
-################################################### CONSTANTS
-dataLocation ='data.xlsx' # file name
 
 ################################################### CODE
 
@@ -61,13 +58,13 @@ class main:
     def survivalAnalysis(self,settings):
         try:
             print(colored(settings.workingText, settings.textColor))
-            data = pd.ExcelFile('testData.xlsx') # open excel file
+            data = pd.ExcelFile('margini data.xlsx') # open excel file
             #data = load_waltons() # returns a Pandas DataFrame    
             self.plottingFits(settings,data)
         except Exception as e:
             self.raiseGenericException(e, settings.exceptionColor)
 
-    ########## plotting 
+    ########## plotting
     def plottingFits(self, settings, data ):
         try:
             dataControl = data.parse(settings.controlSheet)
@@ -82,12 +79,13 @@ class main:
                 fitList = []
                 plotTitle = self.generatePlotTitle(settings.title, function)
                 fig, ax = plt.subplots(1, 1, figsize=(settings.figsize_x, settings.figsize_y))
-                for sf in sfList:      
+                for sf in sfList:
                     fit = dictionary[function]().fit(sf.time, sf.events, label=sf.groupname)
                     ax = fit.plot_survival_function(color=sf.color, ci_show=settings.showCI, show_censors=settings.showCensors, censor_styles={'ms': 6, 'marker': 's'})
                     sf.survivalFit = fit
                     fitList.append(fit)
-                    group2kpfit[function +  "_" + sf.groupname] = fit 
+                    #group2kpfit[function +  "_" + sf.groupname] = fit
+                    group2kpfit[sf.groupname] = fit 
                 if settings.showSummaryTables:
                     add_at_risk_counts(*fitList)
                 if settings.runStatisticTests:
@@ -107,8 +105,7 @@ class main:
                     ax.get_legend().remove()
                 plt.tight_layout()
                 plt.savefig(function + settings.plotName, dpi=settings.dpi)  
-            if settings.runStatisticTests:              
-                self.generateExcelFile(settings, timeLine, group2kpfit)
+            self.generateSurvivalFunctionExcelFile(settings, timeLine, group2kpfit)
         except Exception as e:
             self.raiseGenericException(e, settings.exceptionColor)
 
@@ -126,31 +123,35 @@ class main:
     ########## save results in an excel file
     def generateTestResults(self, settings, sfList):
         try:
+            testDictionary = settings.testDictionary
             with pd.ExcelWriter(settings.excelPValuesFile) as writer:  
-                testResults = survival_difference_at_fixed_point_in_time_test(settings.pointIntime, sfList[1].survivalFit, sfList[0].survivalFit)
-                if settings.showChiSquaredSummary:
+                for test in testDictionary:
+                    if test == 'survivalDiff':
+                        testResults = testDictionary[test](settings.pointIntime, sfList[1].survivalFit, sfList[0].survivalFit)
+                    elif test == 'logRank':
+                        testResults = testDictionary[test](sfList[0].time, sfList[1].time, event_observed_A=sfList[0].events, event_observed_B=sfList[1].events)
                     testResults.print_summary()
-                pvalue =  testResults.p_value
-                testStats = testResults.test_statistic   
-                df = pd.DataFrame([[pvalue, testStats]], columns=['p_value', 'test Stats'])        
-                df.to_excel(writer, sheet_name='s', index=False)
+                    pvalue =  testResults.p_value
+                    testStats = testResults.test_statistic   
+                    df = pd.DataFrame([[pvalue, testStats]], columns=['p_value', 'test Stats'])        
+                    df.to_excel(writer, sheet_name=test+'results', index=False)
         except Exception as e:
             self.raiseGenericException(e, settings.exceptionColor)
 
     ########## save results in an excel file
-    def generateExcelFile(self, settings, timeline, group2kpfit):
+    def generateSurvivalFunctionExcelFile(self, settings, timeline, group2kpfit):
         try:
             with pd.ExcelWriter(settings.excelFile) as writer:  
                 for group in group2kpfit:
+                    # first we generate the survival table
                     survivalFunction = group2kpfit[group].survival_function_at_times(timeline) # get survival function (panda series)
                     survivaltable =  survivalFunction.reset_index() # get results in table format
+                    survivaltable.to_excel(writer, sheet_name=group[:settings.truncate], index=False, header=[settings.timeColumnName,settings.survivalColumnName])
+                    # secondly we generate the event table
                     confidenceInterval = group2kpfit[group].confidence_interval_
                     events = group2kpfit[group].event_table
-                    table = pd.concat([events, confidenceInterval], axis=1).reset_index()
-                    table.rename(columns={ table.columns[0]: settings.timeColumnName}, inplace=True) # inplace attribute prevents from creating a copy 
-                    # print(survivaltable.sort_values(by=['index'],ignore_index=True)
-                    # print(colored("--------------------------------------------------------------------------------------",textColor))
-                    survivaltable.to_excel(writer, sheet_name=group[:settings.truncate], index=False, header=[settings.timeColumnName,settings.survivalColumnName])
-                    table.to_excel(writer, sheet_name=(group+'_overview')[:settings.truncate], index=False)
+                    eventtable = pd.concat([events, confidenceInterval], axis=1).reset_index()
+                    eventtable.rename(columns={ eventtable.columns[0]: settings.timeColumnName}, inplace=True) # inplace attribute prevents from creating a copy 
+                    eventtable.to_excel(writer, sheet_name=(group+'_overview')[:settings.truncate], index=False)
         except Exception as e:
             self.raiseGenericException(e, settings.exceptionColor)
