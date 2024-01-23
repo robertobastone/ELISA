@@ -10,14 +10,12 @@ class getSettings:
 
         self.numversion = "1.06"
 
-        ######################### FIT SETTINGS
-        self.functionDictionary = { "Kaplan Meier": KaplanMeierFitter #,
-                                    # "Weibull Fitter":  WeibullFitter,
-                                    # "Exponential Fitter": ExponentialFitter
-        } # list here the fitter function(s) of the lifeline library
-        self.controlSheet = 'MNT1'
+        ######################### ENTRY DATA
+        ########## control group or first group
+        self.controlSheet = 'T1'
         self.controlSheetColor = '#333399'
-        self.groupSheet =  'MNT2'
+        ########## group or second group
+        self.groupSheet =  'T2'
         self.groupSheetColor = '#cc1912'
        
         ######################### UI SETTINGS
@@ -66,14 +64,34 @@ class getSettings:
         ########## preventing from naming sheets with more than specified number of characters
         self.truncate = 30
         ########## table settings
-        self.runStatisticTests = True
-        self.testDictionary = {
-                        "survivalDiff": survival_difference_at_fixed_point_in_time_test,
-                        "logRank": logrank_test 
-        } # list here the test function(s) of the lifelines.statistics library
-        self.pointIntime = 100
         self.timeColumnName = 'Time'
         self.survivalColumnName = 'Survival Probability (percentage)'
         ########## save settings
         self.excelFile = self.title + 'results.xlsx'
+        
+        ######################### TEST SETTINGS
+        self.runStatisticTests = True
+        ########## list here the fitter function(s) of the lifeline library
+        self.functionDictionary = { 
+                                    # "Weibull Fitter":  WeibullFitter,
+                                    # "Exponential Fitter": ExponentialFitter,
+                                    "Kaplan Meier": KaplanMeierFitter
+        } 
+        ########## list here the test function(s) of the lifelines.statistics library
+        self.testDictionary = {
+                        # "survivalDiff": survival_difference_at_fixed_point_in_time_test,
+                        "logRank": logrank_test 
+        } 
+        ########## logrank_test
+        # Comparison of two survival curves can be done using logrank_test 
+        # In order to test the null hypothesis (= no difference between the population survival curves)
+        # Simply put, the probability of an event occurring at any time is the same for each group
+        # The method returns the p-value (evaluated from the chi squared distribution with 1 degree of freedom)
+        # A very small p-value means that the observed behaviour would be unlikely under the null hypothes
+        ########## survival_difference_at_fixed_point_in_time_test
+        # Rather than comparing the entire survival curves of two groups, we can compare the probabilty at a given time
+        # survival_difference_at_fixed_point_in_time_test compares it at a specific point in time using chi-squared test.
+        # Be wary that this method implicitly exploits the log-log transformation
+        self.pointIntime = 100
+        self.pvalueBox = dict(boxstyle='square', facecolor='white', alpha=0.5)
         self.excelPValuesFile = self.title + 'pvalues.xlsx'

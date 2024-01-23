@@ -58,8 +58,7 @@ class main:
     def survivalAnalysis(self,settings):
         try:
             print(colored(settings.workingText, settings.textColor))
-            data = pd.ExcelFile('margini data.xlsx') # open excel file
-            #data = load_waltons() # returns a Pandas DataFrame    
+            data = pd.ExcelFile('testData.xlsx') # open excel file
             self.plottingFits(settings,data)
         except Exception as e:
             self.raiseGenericException(e, settings.exceptionColor)
@@ -89,7 +88,10 @@ class main:
                 if settings.showSummaryTables:
                     add_at_risk_counts(*fitList)
                 if settings.runStatisticTests:
-                    self.generateTestResults(settings, sfList)
+                    pvalue = self.generateTestResults(settings, sfList)
+                    ax.text(0.985, 0.04, 'p-value = {0:.4f}'.format(pvalue), 
+                        horizontalalignment='right', verticalalignment='top', transform=ax.transAxes,
+                        fontsize=settings.LabelFontSize, bbox=settings.pvalueBox)
                 ax.set_title(plotTitle,fontsize=settings.titleFontSize)
                 ########## x axis settings
                 ax.set_xlim(settings.xlim[0],upperX)
@@ -135,6 +137,7 @@ class main:
                     testStats = testResults.test_statistic   
                     df = pd.DataFrame([[pvalue, testStats]], columns=['p_value', 'test Stats'])        
                     df.to_excel(writer, sheet_name=test+'results', index=False)
+                return pvalue
         except Exception as e:
             self.raiseGenericException(e, settings.exceptionColor)
 
