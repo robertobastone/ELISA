@@ -58,7 +58,7 @@ class main:
     def survivalAnalysis(self,settings):
         try:
             print(colored(settings.workingText, settings.textColor))
-            data = pd.ExcelFile('testData.xlsx') # open excel file
+            data = pd.ExcelFile('margini data.xlsx') # open excel file
             self.plottingFits(settings,data)
         except Exception as e:
             self.raiseGenericException(e, settings.exceptionColor)
@@ -106,7 +106,7 @@ class main:
                 if settings.hideLegend:
                     ax.get_legend().remove()
                 plt.tight_layout()
-                plt.savefig(function + settings.plotName, dpi=settings.dpi)  
+                plt.savefig((function + settings.plotName).replace(' ', ''), dpi=settings.dpi)  
             self.generateSurvivalFunctionExcelFile(settings, timeLine, group2kpfit)
         except Exception as e:
             self.raiseGenericException(e, settings.exceptionColor)
@@ -129,9 +129,26 @@ class main:
             with pd.ExcelWriter(settings.excelPValuesFile) as writer:  
                 for test in testDictionary:
                     if test == 'survivalDiff':
-                        testResults = testDictionary[test](settings.pointIntime, sfList[1].survivalFit, sfList[0].survivalFit)
+                        if(len(sfList)==2):
+                            testResults = testDictionary[test](settings.pointIntime, sfList[1].survivalFit, sfList[0].survivalFit)
                     elif test == 'logRank':
-                        testResults = testDictionary[test](sfList[0].time, sfList[1].time, event_observed_A=sfList[0].events, event_observed_B=sfList[1].events)
+                        if(len(sfList)==2):
+                            testResults = testDictionary[test](sfList[0].time, sfList[1].time, event_observed_A=sfList[0].events, event_observed_B=sfList[1].events)
+                    elif test == 'multiLogRank':
+                        if(len(sfList)>=2):
+                            totalTimes = []
+                            totalEvents = []
+                            totalGroups = []
+                            for i in range(len(sfList)):
+                                totalTimes.extend(sfList[i].time)
+                                totalEvents.extend(sfList[i].events)
+                                totalGroups.extend(np.full(len(sfList[i].time), i))
+                            dataFrame = pd.DataFrame({
+                                'time': totalTimes,
+                                'events': totalEvents,
+                                'groups': totalGroups
+                            })
+                            testResults = testDictionary[test](dataFrame['time'], dataFrame['groups'], dataFrame['events'])
                     testResults.print_summary()
                     pvalue =  testResults.p_value
                     testStats = testResults.test_statistic   
