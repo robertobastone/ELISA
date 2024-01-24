@@ -12,11 +12,14 @@ class getSettings:
 
         ######################### ENTRY DATA
         ########## control group or first group
-        self.controlSheet = 'MNT1'
+        self.controlSheet = 'T1'
         self.controlSheetColor = '#333399'
         ########## group or second group
-        self.groupSheet =  'MNT2'
+        self.groupSheet =  'T2recurrence'
         self.groupSheetColor = '#cc1912'
+        ######### third group
+        self.thirdGroupSheet =  'T3'
+        self.thirdGroupSheetColor = '#0b5e15'
        
         ######################### UI SETTINGS
         self.textColor = "blue"

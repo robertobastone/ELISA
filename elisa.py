@@ -58,7 +58,7 @@ class main:
     def survivalAnalysis(self,settings):
         try:
             print(colored(settings.workingText, settings.textColor))
-            data = pd.ExcelFile('margini data.xlsx') # open excel file
+            data = pd.ExcelFile('testData.xlsx') # open excel file
             self.plottingFits(settings,data)
         except Exception as e:
             self.raiseGenericException(e, settings.exceptionColor)
@@ -131,9 +131,13 @@ class main:
                     if test == 'survivalDiff':
                         if(len(sfList)==2):
                             testResults = testDictionary[test](settings.pointIntime, sfList[1].survivalFit, sfList[0].survivalFit)
+                        else:
+                            continue
                     elif test == 'logRank':
                         if(len(sfList)==2):
                             testResults = testDictionary[test](sfList[0].time, sfList[1].time, event_observed_A=sfList[0].events, event_observed_B=sfList[1].events)
+                        else:
+                            continue
                     elif test == 'multiLogRank':
                         if(len(sfList)>=2):
                             totalTimes = []
@@ -149,6 +153,8 @@ class main:
                                 'groups': totalGroups
                             })
                             testResults = testDictionary[test](dataFrame['time'], dataFrame['groups'], dataFrame['events'])
+                        else:
+                            continue
                     testResults.print_summary()
                     pvalue =  testResults.p_value
                     testStats = testResults.test_statistic   
