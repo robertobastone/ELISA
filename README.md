@@ -27,3 +27,5 @@ Estimation of LIfelines and Survival Analysis (ELISA) is a script which exploits
 - added flexibility in test section (it is now possible to specify between logRank and SurvivalDiff tests in setting page)
 # Version 1.08 (24th January 2023)
 - multiLogRank method available
+# Version 1.09 (28th January 2023)
+- extended longRank method in order to consider all possible combinations for more than 2 groups

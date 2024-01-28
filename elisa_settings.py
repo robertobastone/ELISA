@@ -8,17 +8,17 @@ class getSettings:
 
     def __init__(self):
 
-        self.numversion = "1.08"
+        self.numversion = "1.09"
 
         ######################### ENTRY DATA
         ########## control group or first group
-        self.controlSheet = 'T1'
+        self.controlSheet = 'MN'
         self.controlSheetColor = '#333399'
         ########## group or second group
-        self.groupSheet =  'T2recurrence'
+        self.groupSheet =  'MCRecurrence'
         self.groupSheetColor = '#cc1912'
         ######### third group
-        self.thirdGroupSheet =  'T3'
+        self.thirdGroupSheet =  'MPsurgicalRecurrence'
         self.thirdGroupSheetColor = '#0b5e15'
        
         ######################### UI SETTINGS
@@ -33,7 +33,7 @@ class getSettings:
         self.figsize_x = 13
         self.figsize_y = 10
         ########## plot title
-        self.title = 'Survival Function' 
+        self.title = 'Surgical Recurrences Comparison' 
         ########## plot font size
         self.titleFontSize = 20
         self.axisLabelFontSize = 15
@@ -83,8 +83,8 @@ class getSettings:
         ########## list here the test function(s) of the lifelines.statistics library
         self.testDictionary = {
                         # "survivalDiff": survival_difference_at_fixed_point_in_time_test,
-                        "logRank": logrank_test,
-                        "multiLogRank" : multivariate_logrank_test 
+                        "logRank": logrank_test
+                        #"multiLogRank" : multivariate_logrank_test 
         } 
         ########## logrank_test
         # Comparison of two survival curves can be done using logrank_test 
