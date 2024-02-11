@@ -12,13 +12,13 @@ class getSettings:
 
         ######################### ENTRY DATA
         ########## control group or first group
-        self.controlSheet = 'MN'
+        self.controlSheet = 'control'
         self.controlSheetColor = '#333399'
         ########## group or second group
-        self.groupSheet =  'MCRecurrence'
+        self.groupSheet =  'group'
         self.groupSheetColor = '#cc1912'
         ######### third group
-        self.thirdGroupSheet =  'MPsurgicalRecurrence'
+        self.thirdGroupSheet =  'third'
         self.thirdGroupSheetColor = '#0b5e15'
        
         ######################### UI SETTINGS
@@ -33,7 +33,7 @@ class getSettings:
         self.figsize_x = 13
         self.figsize_y = 10
         ########## plot title
-        self.title = 'Surgical Recurrences Comparison' 
+        self.title = 'Walton Data' 
         ########## plot font size
         self.titleFontSize = 20
         self.axisLabelFontSize = 15
@@ -100,5 +100,4 @@ class getSettings:
         # survival_difference_at_fixed_point_in_time_test compares it at a specific point in time using chi-squared test.
         # Be wary that this method implicitly exploits the log-log transformation
         self.pointIntime = 100
-        self.pvalueBox = dict(boxstyle='square', facecolor='white', alpha=0.5)
         self.excelPValuesFile = self.title.replace(' ', '') + 'pvalues.xlsx'

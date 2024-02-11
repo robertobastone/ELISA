@@ -59,7 +59,7 @@ class main:
     def survivalAnalysis(self,settings):
         try:
             print(colored(settings.workingText, settings.textColor))
-            data = pd.ExcelFile('margini data.xlsx') # open excel file
+            data = pd.ExcelFile('walton.xlsx') # open excel file
             self.plottingFits(settings,data)
         except Exception as e:
             self.raiseGenericException(e, settings.exceptionColor)
@@ -69,14 +69,14 @@ class main:
         try:
             dataControl = data.parse(settings.controlSheet)
             dataGroup = data.parse(settings.groupSheet)
-            dataThird = data.parse(settings.thirdGroupSheet)
+            #dataThird = data.parse(settings.thirdGroupSheet)
             upperX = self.calculateXUpperLimit(dataControl['T'].max(),settings.xbase)
             timeLine = np.linspace(0.0, upperX, settings.tableRowsNumber)
             group2kpfit = {}
             dictionary = settings.functionDictionary      
-            sfList = [SurvivalFit('Negative Margins', settings.controlSheetColor, dataControl['T'], dataControl['E'], None),
-                        SurvivalFit('Close Margins', settings.groupSheetColor, dataGroup['T'], dataGroup['E'], None),
-                        SurvivalFit('Positive Margins', settings.thirdGroupSheetColor, dataThird['T'], dataThird['E'], None)]
+            sfList = [SurvivalFit(settings.controlSheet, settings.controlSheetColor, dataControl['T'], dataControl['E'], None),
+                        SurvivalFit(settings.groupSheet, settings.groupSheetColor, dataGroup['T'], dataGroup['E'], None)]
+                        #SurvivalFit('3rd', settings.thirdGroupSheetColor, dataThird['T'], dataThird['E'], None)]
             for function in dictionary:
                 fitList = []
                 plotTitle = self.generatePlotTitle(settings.title, function)
@@ -92,23 +92,21 @@ class main:
                     add_at_risk_counts(*fitList)
                 if settings.runStatisticTests:
                     resultDictionary = self.generateTestResults(settings, sfList)  
-                    i = 0                 
-                    for result in resultDictionary:
-                        ax.text(0.985, 0.04*(i+1), 'p-value ' + result + ' = {0:.4f}'.format(resultDictionary[result].p_value), 
-                            horizontalalignment='right', verticalalignment='top', transform=ax.transAxes,
-                            fontsize=settings.LabelFontSize, bbox=settings.pvalueBox)
-                        i += 1
+                    ax2 = ax.twinx()
+                    customHandles = [ax2.plot([],[], ms=0, label = 'p-value ' + result + ' = {0:.9f}'.format(resultDictionary[result].p_value), ls="") for result in resultDictionary]
+                    ax2.legend(handles=customHandles, labels='', loc=4, title="", fontsize=settings.LabelFontSize, handlelength=0, handletextpad=0)
+                    ax2.get_yaxis().set_visible(False)
                 ax.set_title(plotTitle,fontsize=settings.titleFontSize)
                 ########## x axis settings
                 ax.set_xlim(settings.xlim[0],upperX)
                 ax.set_xlabel(settings.xlabel,fontsize=settings.axisLabelFontSize)
                 ########## y axis settings
                 ax.set_ylim(settings.ylim[0],settings.ylim[1])
-                #ax.set_ylabel(settings.ylabel,fontsize=settings.axisLabelFontSize)
+                ax.set_ylabel(settings.ylabel,fontsize=settings.axisLabelFontSize)
                 if settings.changeScale:
                     ax.set_yticks(settings.yticks)
                     ax.set_yticklabels(settings.yticksLabel)
-                ax.legend(fontsize=settings.LabelFontSize)
+                ax.legend(loc=3, fontsize=settings.LabelFontSize)
                 if settings.hideLegend:
                     ax.get_legend().remove()
                 plt.tight_layout()
@@ -137,13 +135,12 @@ class main:
                 for test in testDictionary:
                     if test == 'survivalDiff':
                         if(len(sfList)==2):
-                            resultDictionary['Survival Difference'] = testDictionary[test](settings.pointIntime, sfList[1].survivalFit, sfList[0].survivalFit)
+                            resultDictionary['(Survival Difference)'] = testDictionary[test](settings.pointIntime, sfList[1].survivalFit, sfList[0].survivalFit)
                         else:
                             continue
                     elif test == 'logRank':
                         if(len(sfList)>=2):
                             allPossibleCouples = list(itertools.combinations(range(len(sfList)), 2))
-                            print(allPossibleCouples)
                             for couple in allPossibleCouples:
                                 resultDictionary['('+sfList[couple[0]].groupname+' vs '+sfList[couple[1]].groupname+')'] = testDictionary[test](sfList[couple[0]].time, sfList[couple[1]].time, event_observed_A=sfList[couple[0]].events, event_observed_B=sfList[couple[1]].events)
                         else:
@@ -162,7 +159,7 @@ class main:
                                 'events': totalEvents,
                                 'groups': totalGroups
                             })
-                            resultDictionary['MultiLog Rank'] = testDictionary[test](dataFrame['time'], dataFrame['groups'], dataFrame['events'])
+                            resultDictionary['(MultiLog Rank)'] = testDictionary[test](dataFrame['time'], dataFrame['groups'], dataFrame['events'])
                         else:
                             continue
                     for result in resultDictionary:
