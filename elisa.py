@@ -93,7 +93,7 @@ class main:
                 if settings.runStatisticTests:
                     resultDictionary = self.generateTestResults(settings, sfList)  
                     ax2 = ax.twinx()
-                    customHandles = [ax2.plot([],[], ms=0, label = 'p-value ' + result + ' = {0:.9f}'.format(resultDictionary[result].p_value), ls="") for result in resultDictionary]
+                    customHandles = [ax2.plot([],[], ms=0, label = 'p-value ' + result + ' = {0:.3f}'.format(resultDictionary[result].p_value), ls="") for result in resultDictionary]
                     ax2.legend(handles=customHandles, labels='', loc=4, title="", fontsize=settings.LabelFontSize, handlelength=0, handletextpad=0)
                     ax2.get_yaxis().set_visible(False)
                 ax.set_title(plotTitle,fontsize=settings.titleFontSize)
