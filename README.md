@@ -19,13 +19,13 @@ Estimation of LIfelines and Survival Analysis (ELISA) is a script which exploits
 ## Version 1.04 (10th September 2023)
 - improved ui messages generation
 - created setting in order to prevent the "UserWarning: Title is more than 31 characters."
-## Version 1.05 (21st January 2023)
+## Version 1.05 (21st January 2024)
 - added code to read data from .xlsx files
-## Version 1.06 (22nd January 2023)
+## Version 1.06 (22nd January 2024)
 - added additional settings
-## Version 1.07 (23rd January 2023)
+## Version 1.07 (23rd January 2024)
 - added flexibility in test section (it is now possible to specify between logRank and SurvivalDiff tests in setting page)
-## Version 1.08 (24th January 2023)
+## Version 1.08 (24th January 2024)
 - multiLogRank method available
-## Version 1.09 (28th January 2023)
+## Version 1.09 (28th January 2024)
 - extended longRank method in order to consider all possible combinations for more than 2 groups
